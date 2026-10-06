@@ -21,7 +21,7 @@ fbq('init','2168611447417675');fbq('track','PageView');
 (()=>{
   const music = document.getElementById('bg-music');
   const button = document.getElementById('music-toggle');
-  let started = false;
+  let isPlaying = false;
   music.volume = 1;
 
   function updateUI() {
@@ -29,47 +29,52 @@ fbq('init','2168611447417675');fbq('track','PageView');
     button.setAttribute('aria-pressed', String(!music.paused));
   }
 
-  async function tryPlay() {
+  // 尝试播放音乐的主函数
+  async function startAudio() {
+    if (isPlaying) return;
     try {
       await music.play();
-      started = true;
-      removeInteractionListeners();
+      isPlaying = true;
+      removeListeners(); // 成功播放后立即移除全局监听
       updateUI();
-    } catch (e) {
+    } catch (err) {
       updateUI();
     }
   }
 
-  function handleInteraction() {
-    if (!started) {
-      tryPlay();
-    }
+  // 触发播放的回调
+  function handleUserGesture() {
+    startAudio();
   }
 
-  function removeInteractionListeners() {
-    ['click', 'touchstart', 'touchend', 'scroll', 'keydown'].forEach(event => {
-      document.removeEventListener(event, handleInteraction);
+  // 移除所有手势监听
+  function removeListeners() {
+    ['click', 'touchstart', 'touchend', 'pointerdown'].forEach(evt => {
+      window.removeEventListener(evt, handleUserGesture, true);
     });
   }
 
-  // 监听手势与滑动事件（顾客滑动屏幕即可直接触发播放）
-  ['click', 'touchstart', 'touchend', 'scroll', 'keydown'].forEach(event => {
-    document.addEventListener(event, handleInteraction, { passive: true });
+  // 绑定全局捕获事件：只要手指碰到屏幕（准备划动或点击），立即触发播放
+  ['click', 'touchstart', 'touchend', 'pointerdown'].forEach(evt => {
+    window.addEventListener(evt, handleUserGesture, { capture: true, once: false });
   });
 
+  // 音乐控制按钮点击事件
   button.addEventListener('click', (e) => {
     e.stopPropagation();
     if (music.paused) {
-      tryPlay();
+      startAudio();
     } else {
       music.pause();
+      isPlaying = false;
+      updateUI();
     }
   });
 
   music.addEventListener('play', updateUI);
   music.addEventListener('pause', updateUI);
 
-  // 页面加载完尝试静音/常规播放
-  tryPlay();
+  // 页面刚加载时尝试播放一次
+  startAudio();
 })();
 </script>
