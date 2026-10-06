@@ -11,7 +11,7 @@ fbq('init','2168611447417675');fbq('track','PageView');
 <section class="location wrap" id="location"><div><p class="eyebrow">03 / CONNECTED TO THE CITY</p><h2>生活配套，<br>就在周边。</h2><p class="muted">购物、医疗与交通配套，<br>让你更容易安排每一天。</p><p class="note">距离摘自项目资料，为估算值；实际路线及交通情况可能不同。</p></div><div class="distances"><div><span>Beletime Danga Bay<small>购物与日常消费</small></span><strong>750 <em>m</em></strong></div><div><span>Sultanah Aminah Hospital<small>医疗配套</small></span><strong>2.8 <em>km</em></strong></div><div><span>Johor Bahru City Square<small>市中心购物</small></span><strong>5.7 <em>km</em></strong></div><div><span>Johor Bahru Sentral<small>交通枢纽</small></span><strong>5.9 <em>km</em></strong></div><div><span>Bukit Chagar RTS 站址<small>跨境交通规划</small></span><strong>6.6 <em>km</em></strong></div><div><span>Johor Bahru CIQ<small>新山关卡</small></span><strong>6.7 <em>km</em></strong></div></div></section>
 <section class="faq wrap"><p class="eyebrow">04 / GOOD TO KNOW</p><h2>看房前，你可能想问。</h2><details><summary>目前价钱和优惠是多少？</summary><p>一房全家私单位 RM416,000 起，月供 RM1,800 起。起价适用于指定单位，并非每个一房户型均为此价格。月供为估算，实际金额取决于贷款额、利率及年限，以银行批准条件为准。其他价格、回扣及家私配套会因户型、楼层、单位与购买条件而不同。点击 WhatsApp，告诉我你的预算与需求，我会提供对应单位的最新资料。</p></details><details><summary>每个单位都看海吗？</summary><p>景观会因楼栋、单位朝向、楼层及周边发展而不同。请联系查询具体单位的方向及景观；整体效果图不代表每个单位的实际视野。</p></details><details><summary>“两房＋书房”是三房吗？</summary><p>本页按项目资料标示为两间卧室加一间书房，并未将书房直接列为第三间卧室。可点击平面图查看空间安排。</p></details><details><summary>怎样预约参观或查询交付时间？</summary><p>点击下方 WhatsApp 联系 Wee Nun，告诉我你方便的日期、预算和房间需求。我会协助确认参观安排，并提供最新工程及预计交付资料。</p></details></section>
 <section class="contact" id="contact"><div class="wrap contact-layout"><div class="portrait-frame"><img src="assets/wee-nun-portrait.png" alt="Wee Nun 房地产顾问" width="751" height="1177" loading="lazy"></div><div class="contact-copy"><p class="eyebrow">LET’S FIND YOUR NEXT HOME</p><h2>你的下一间家，<br>从一次聊天开始。</h2><p>告诉我预算、房型与用途，我帮你筛选合适的单位。</p><a class="button gold" href="https://wa.link/643agt" target="_blank" rel="noopener">WhatsApp 联系 Wee Nun</a><div class="signature">Wee Nun <span>Real Estate, Real Home, Real Trust.</span></div></div></div></section></main><footer class="wrap"><span>© 2026 Wee Nun · Property Collection</span><p>资料依据所提供项目简报（标注更新于 2025 年 8 月 28 日）整理。图片仅供示意，面积为约数；规划、户型及规格可能调整，以发展商最新资料及买卖合约为准。</p></footer><a class="floatwa" href="https://wa.link/643agt" target="_blank" rel="noopener" aria-label="WhatsApp 联系 Wee Nun"><img class="floatwa-avatar" src="assets/wee-nun-portrait.png" alt="" width="48" height="48"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-11.6 7.2L4 20l1.3-4.4A8 8 0 1 1 20 11.5Z"/><path d="M9 8c0 4 3 6 6 6l1-2-2-1-1 1-2-2 1-1-1-2Z"/></svg><span>咨询</span></a><dialog id="viewer"><button id="close" aria-label="关闭平面图">关闭 ×</button><h3 id="viewtitle"></h3><img id="viewimg" alt=""><p>平面图仅供参考，尺寸以最终确认资料为准。</p></dialog><script src="app.js"></script>
-<audio id="bg-music" loop preload="none"><source src="background-music.mp3" type="audio/mpeg"></audio>
+<audio id="bg-music" autoplay loop preload="auto"><source src="background-music.mp3" type="audio/mpeg"></audio>
 <button id="music-toggle" type="button" aria-pressed="false" aria-controls="bg-music">🎵 播放音乐</button>
 <style>
 #music-toggle{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:16px;z-index:1000;padding:10px 14px;min-height:44px;border:1px solid #dfbe78;border-radius:30px;background:#101a24;color:#dfbe78;font:14px system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 16px #0003}
@@ -21,17 +21,26 @@ fbq('init','2168611447417675');fbq('track','PageView');
 (()=>{
  const music=document.getElementById('bg-music');
  const button=document.getElementById('music-toggle');
+ let startup=true;
  music.volume=1;
- const update=()=>{button.textContent=music.paused?'🎵 播放音乐':'⏸ 暂停音乐';button.setAttribute('aria-pressed',String(!music.paused));};
- button.addEventListener('click',async()=>{
-  if(!music.paused){music.pause();return;}
-  button.disabled=true;
-  try{await music.play();}catch{button.textContent='🎵 无法播放，点击重试';}
-  finally{button.disabled=false;}
- });
- music.addEventListener('play',update);
+ function cleanup(){startup=false;document.removeEventListener('click',activate);document.removeEventListener('keydown',activate);}
+ function update(){button.textContent=music.paused?'🎵 播放音乐':'⏸ 暂停音乐';button.setAttribute('aria-pressed',String(!music.paused));}
+ async function play(){
+  try{await music.play();cleanup();update();}
+  catch(error){if(music.paused){button.textContent=error.name==='NotAllowedError'?'🎵 点击开启音乐':'🎵 无法播放，点击重试';button.setAttribute('aria-pressed','false');}}
+ }
+ function activate(event){
+  if(!startup || button.contains(event.target))return;
+  if(event.type==='keydown' && (!['Enter',' '].includes(event.key)||event.repeat))return;
+  play();
+ }
+ button.addEventListener('click',()=>{cleanup();if(music.paused)play();else music.pause();});
+ music.addEventListener('play',()=>{cleanup();update();});
  music.addEventListener('pause',update);
  music.addEventListener('error',()=>{button.textContent='🎵 无法播放，点击重试';button.setAttribute('aria-pressed','false');});
+ document.addEventListener('click',activate);
+ document.addEventListener('keydown',activate);
+ play();
 })();
 </script>
 </body></html>
