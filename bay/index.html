@@ -1,22 +1,79 @@
-const units=[{"name": "A2", "tower": 3, "beds": 1, "baths": 1, "sqm": 47, "sqft": 506}, {"name": "A4", "tower": 1, "beds": 1, "baths": 1, "sqm": 50, "sqft": 538}, {"name": "A5", "tower": 1, "beds": 1, "baths": 1, "sqm": 55, "sqft": 592}, {"name": "A6", "tower": 2, "beds": 1, "baths": 1, "sqm": 60, "sqft": 646}, {"name": "A7", "tower": 2, "beds": 1, "baths": 1, "sqm": 63, "sqft": 678}, {"name": "A8", "tower": 1, "beds": 1, "baths": 1, "sqm": 65, "sqft": 700}, {"name": "B3", "tower": 1, "beds": 1, "baths": 1, "sqm": 70, "sqft": 753}, {"name": "B2A", "tower": 3, "beds": 1, "baths": 2, "sqm": 75, "sqft": 807}, {"name": "B1-1", "tower": 3, "beds": 2, "baths": 2, "sqm": 77, "sqft": 829}, {"name": "B5", "tower": 2, "beds": 2, "baths": 2, "sqm": 79, "sqft": 850}, {"name": "B10", "tower": 1, "beds": 2, "baths": 2, "sqm": 83, "sqft": 893}, {"name": "B11", "tower": 1, "beds": 2, "baths": 2, "sqm": 81, "sqft": 872}, {"name": "B7", "tower": 1, "beds": 3, "baths": 1, "sqm": 80, "sqft": 861}, {"name": "B14", "tower": 2, "beds": 3, "baths": 2, "sqm": 96, "sqft": 1033}, {"name": "C1-1", "tower": 3, "beds": 3, "baths": 2, "sqm": 86, "sqft": 926}, {"name": "D1-1", "tower": 3, "beds": 3, "baths": 2, "sqm": 100, "sqft": 1076}];
-const grid=document.getElementById('units');
-const viewer=document.getElementById('viewer');
-function enquiryLink(u){
- return "https://wa.me/60128820919?text=" + encodeURIComponent(`你好 Wee Nun，我想了解海湾公寓 Tower ${u.tower} 的 Type ${u.name}（${u.sqft} sqft / ${u.sqm} sq.m.）。请发我这个户型的价钱、配套和可售单位，谢谢！`);
-}
-function render(filter=0){
- const shown=units.filter(u=>!filter||u.beds===filter);
- document.getElementById('count').textContent=`展示 ${shown.length} 种精选标准户型 · 可售状态请咨询`;
- grid.innerHTML=shown.map(u=>`<article class="unit"><button class="planbtn" data-plan="${u.name}" aria-label="放大 Type ${u.name} 平面图"><img src="assets/${u.name}.webp" alt="Type ${u.name} 户型图" loading="lazy"><span class="zoom">放大查看</span></button><div class="unitbody"><div class="unitline"><h3>Type ${u.name}</h3><span>TOWER ${u.tower}</span></div>${["A2","A5","A6"].includes(u.name)?'<div class="furnished">Fully Furnished · 全套家私</div>':''}<p>${u.beds===3?'两房＋书房':u.beds===2?'两房':'一房'} · ${u.baths} 浴室</p><div class="size">${u.sqft.toLocaleString()} <small>sqft / ${u.sqm} sq.m.</small></div><a class="unitcta" href="${enquiryLink(u)}" target="_blank" rel="noopener">WhatsApp 查询 Type ${u.name}</a></div></article>`).join('');
-}
-render();
-document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});render(Number(b.dataset.filter))}));
-grid.addEventListener('click',e=>{const b=e.target.closest('[data-plan]');if(!b)return;const name=b.dataset.plan;document.getElementById('viewtitle').textContent='Type '+name;const img=document.getElementById('viewimg');img.src='assets/'+name+'.webp';img.alt='Type '+name+' 平面图';viewer.showModal()});
-document.getElementById('close').addEventListener('click',()=>viewer.close());viewer.addEventListener('click',e=>{if(e.target===viewer){const r=viewer.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)viewer.close()}});
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新山海湾永久地契公寓 · Wee Nun</title>
+    <!-- 引入你的样式表 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-const seaVideo=document.getElementById('sea-video');
-document.getElementById('video-quality').addEventListener('change',e=>{
- const t=seaVideo.currentTime||0;const resume=!seaVideo.paused;
- seaVideo.pause();seaVideo.src=e.target.value==='4k'?'assets/seaview-v2-4k.mp4':'assets/seaview-v2-hd.mp4';
- seaVideo.addEventListener('loadedmetadata',()=>{seaVideo.currentTime=Math.min(t,seaVideo.duration||t);if(resume)seaVideo.play().catch(()=>{});},{once:true});seaVideo.load();
-});
+    <!-- 这里的 HTML 结构会自动去读取并渲染你的户型数据 -->
+    <div class="wrap">
+        <header>
+            <div class="brand"><span>WN</span><small>WEE NUN<br>PROPERTY</small></div>
+            <nav>
+                <a href="#video">海景视频</a>
+                <a href="#units-section">户型</a>
+                <a class="navcta" href="https://wa.me" target="_blank">WhatsApp 咨询</a>
+            </nav>
+        </header>
+
+        <!-- 海景视频区域 -->
+        <section id="video" class="sea-section" style="padding-top:120px;">
+            <div class="sectionhead">
+                <h2>看看海景什么样子先</h2>
+                <p>按播放，感受窗外的海湾景色。</p>
+            </div>
+            <div class="video-quality">
+                <label for="video-quality">播放画质：</label>
+                <select id="video-quality">
+                    <option value="hd">高清 · 1080p</option>
+                    <option value="4k">4K · 2160p</option>
+                </select>
+            </div>
+            <video id="sea-video" controls poster="assets/A2.webp">
+                <source src="assets/seaview-v2-hd.mp4" type="video/mp4">
+                你的浏览器不支持视频播放。
+            </video>
+            <p class="sea-note">此视频为景观参考，实际景观因楼栋、楼层及朝向而异。</p>
+        </section>
+
+        <!-- 户型筛选与展示区域 -->
+        <section id="units-section" class="homes">
+            <div class="sectionhead">
+                <div>
+                    <span class="eyebrow">02 / FIND YOUR SPACE</span>
+                    <h2>先选生活，再选户型。</h2>
+                </div>
+                <div class="filters">
+                    <button data-filter="0" class="active">全部户型</button>
+                    <button data-filter="1">一房</button>
+                    <button data-filter="2">两房</button>
+                    <button data-filter="3">两房＋书房</button>
+                </div>
+            </div>
+            <div id="count">正在加载户型...</div>
+            <div id="units" class="unitgrid"></div>
+        </section>
+    </div>
+
+    <!-- 放大查看的弹窗 -->
+    <dialog id="viewer">
+        <button id="close">关闭 ×</button>
+        <h3 id="viewtitle">户型图</h3>
+        <img id="viewimg" src="" alt="平面图">
+        <p>平面图仅供参考，尺寸以最终确认资料为准。</p>
+    </dialog>
+
+    <!-- 底部悬浮 WhatsApp -->
+    <a class="floatwa" href="https://wa.me" target="_blank">
+        <img class="floatwa-avatar" src="assets/A2.webp" alt="Wee Nun">
+        <span>WhatsApp 联系 Wee Nun</span>
+    </a>
+
+    <!-- 🌟 这里是核心：引入你的逻辑代码，让网页活起来 -->
+    <script src="app.js"></script>
+</body>
+</html>
