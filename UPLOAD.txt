@@ -1,0 +1,13 @@
+上传说明
+
+1. 解压此文件。
+2. 将最外层 index.html 和整个 pelangi 文件夹上传至 GitHub 仓库最外层。
+3. 点击 Commit changes。
+4. 原有 bay 文件夹和 CNAME 保留。
+
+主页：https://weenunproperty.com/
+海湾页面：https://weenunproperty.com/bay/
+新项目：https://weenunproperty.com/pelangi/
+
+图片已内嵌，无需另外上传图片。主页沿用 /bay/background-music.mp3；自动播放受浏览器限制。
+主页和新项目页面使用原有 Meta Pixel。
