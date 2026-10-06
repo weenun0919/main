@@ -19,28 +19,57 @@ fbq('init','2168611447417675');fbq('track','PageView');
 </style>
 <script>
 (()=>{
- const music=document.getElementById('bg-music');
- const button=document.getElementById('music-toggle');
- let startup=true;
- music.volume=1;
- function cleanup(){startup=false;document.removeEventListener('click',activate);document.removeEventListener('keydown',activate);}
- function update(){button.textContent=music.paused?'🎵 播放音乐':'⏸ 暂停音乐';button.setAttribute('aria-pressed',String(!music.paused));}
- async function play(){
-  try{await music.play();cleanup();update();}
-  catch(error){if(music.paused){button.textContent=error.name==='NotAllowedError'?'🎵 点击开启音乐':'🎵 无法播放，点击重试';button.setAttribute('aria-pressed','false');}}
- }
- function activate(event){
-  if(!startup || button.contains(event.target))return;
-  if(event.type==='keydown' && (!['Enter',' '].includes(event.key)||event.repeat))return;
-  play();
- }
- button.addEventListener('click',()=>{cleanup();if(music.paused)play();else music.pause();});
- music.addEventListener('play',()=>{cleanup();update();});
- music.addEventListener('pause',update);
- music.addEventListener('error',()=>{button.textContent='🎵 无法播放，点击重试';button.setAttribute('aria-pressed','false');});
- document.addEventListener('click',activate);
- document.addEventListener('keydown',activate);
- play();
+  const music = document.getElementById('bg-music');
+  const button = document.getElementById('music-toggle');
+  let started = false;
+  music.volume = 1;
+
+  function updateUI() {
+    button.textContent = music.paused ? '🎵 播放音乐' : '⏸ 暂停音乐';
+    button.setAttribute('aria-pressed', String(!music.paused));
+  }
+
+  async function tryPlay() {
+    try {
+      await music.play();
+      started = true;
+      removeInteractionListeners();
+      updateUI();
+    } catch (e) {
+      updateUI();
+    }
+  }
+
+  function handleInteraction() {
+    if (!started) {
+      tryPlay();
+    }
+  }
+
+  function removeInteractionListeners() {
+    ['click', 'touchstart', 'touchend', 'scroll', 'keydown'].forEach(event => {
+      document.removeEventListener(event, handleInteraction);
+    });
+  }
+
+  // 监听手势与滑动事件（顾客滑动屏幕即可直接触发播放）
+  ['click', 'touchstart', 'touchend', 'scroll', 'keydown'].forEach(event => {
+    document.addEventListener(event, handleInteraction, { passive: true });
+  });
+
+  button.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (music.paused) {
+      tryPlay();
+    } else {
+      music.pause();
+    }
+  });
+
+  music.addEventListener('play', updateUI);
+  music.addEventListener('pause', updateUI);
+
+  // 页面加载完尝试静音/常规播放
+  tryPlay();
 })();
 </script>
-</body></html>
