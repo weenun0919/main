@@ -13,7 +13,7 @@ if (twoRoomButton) {
  const shown = units.filter(u => {
   const category = studyUnits.includes(u.name) ? 2 : u.beds;
   return !filter || category === filter;
-});;
+});
  document.getElementById('count').textContent=`展示 ${shown.length} 种精选标准户型 · 可售状态请咨询`;
  grid.innerHTML=shown.map(u=>`<article class="unit"><button class="planbtn" data-plan="${u.name}" aria-label="放大 Type ${u.name} 平面图"><img src="assets/${u.name}.webp" alt="Type ${u.name} 户型图" loading="lazy"><span class="zoom">放大查看</span></button><div class="unitbody"><div class="unitline"><h3>Type ${u.name}</h3><span>TOWER ${u.tower}</span></div>${["A2","A5","A6"].includes(u.name)?'<div class="furnished">Fully Furnished · 全套家私</div>':''}<p>${studyUnits.includes(u.name)?'1房＋书房':u.beds===3?'两房＋书房':u.beds===2?'两房':'一房'} · ${u.baths} 浴室</p><div class="size">${u.sqft.toLocaleString()} <small>sqft / ${u.sqm} sq.m.</small></div><a class="unitcta" href="${enquiryLink(u)}" target="_blank" rel="noopener">WhatsApp 查询 Type ${u.name}</a></div></article>`).join('');
 }
